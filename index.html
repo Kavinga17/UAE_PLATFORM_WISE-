@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UAE SERP — Platform Tracker</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  color-scheme:light;
+  --bg:#f8f9fb;--surface:#ffffff;--border:#dfe3ea;
+  --text:#0d1117;--muted:#4b5563;--faint:#8a919c;--accent:#1f3a5f;
+  --tbl-border:#9fb3cc;--tbl-head:#dbe5f1;--tbl-head-text:#1f3a5f;--tbl-cell:#dbe5f1;
+  --seek:#2a78d6;--seek-bg:#eff6ff;--seek-border:#bfdbfe;
+  --indeed:#eb6834;--indeed-bg:#fff4ef;--indeed-border:#fbd5c0;
+  --linkedin:#0a66c2;--linkedin-bg:#f3f4f6;--linkedin-border:#d6dae0;
+  --note-red:#c62828;
+}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0d1014;--surface:#161a20;--border:#2a303a;
+  --text:#f3f4f6;--muted:#c2c7cf;--faint:#8a919c;--accent:#9dbbe0;
+  --tbl-border:#34475f;--tbl-head:#1c2a3b;--tbl-head-text:#c5d6ec;--tbl-cell:#243449;
+  --seek:#5b9cf0;--seek-bg:#0e1c33;--seek-border:#1e3a5f;
+  --indeed:#f97316;--indeed-bg:#1e1208;--indeed-border:#7c3614;
+  --linkedin:#5aa2e8;--linkedin-bg:#1c1f24;--linkedin-border:#343a43;
+  --note-red:#ff8a80;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d1014;--surface:#161a20;--border:#2a303a;
+  --text:#f3f4f6;--muted:#c2c7cf;--faint:#8a919c;--accent:#9dbbe0;
+  --tbl-border:#34475f;--tbl-head:#1c2a3b;--tbl-head-text:#c5d6ec;--tbl-cell:#243449;
+  --seek:#5b9cf0;--seek-bg:#0e1c33;--seek-border:#1e3a5f;
+  --indeed:#f97316;--indeed-bg:#1e1208;--indeed-border:#7c3614;
+  --linkedin:#5aa2e8;--linkedin-bg:#1c1f24;--linkedin-border:#343a43;
+  --note-red:#ff8a80;
+}
+body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;min-height:100vh}
+.hdr{background:#1f3a5f;color:#fff;padding:16px 24px;display:flex;flex-wrap:wrap;
+  align-items:center;gap:12px;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+.hdr h1{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.hdr small{font-size:12px;opacity:.8;margin-left:auto}
+.wrap{padding:24px 16px;max-width:1020px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.sec-hdr{display:flex;align-items:baseline;gap:12px;padding-bottom:10px;border-bottom:2px solid var(--accent)}
+.sec-hdr h2{font-size:19px;font-weight:800;text-wrap:balance}
+.sec-hdr .tag{margin-left:auto;font-size:18px;font-weight:800;color:var(--accent);white-space:nowrap}
+.method{font-size:12px;color:var(--muted);line-height:1.6;max-width:75ch}
+.top-note{margin-top:10px;font-size:13px;font-weight:700;color:var(--note-red);line-height:1.5;max-width:75ch}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column}
+.card-hdr{padding:11px 18px;background:#1f3a5f;color:#fff;font-size:13px;font-weight:700;
+  letter-spacing:.04em;text-transform:uppercase;border-radius:12px 12px 0 0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.card-hdr .kw{font-size:11px;font-weight:400;opacity:.8;text-transform:none;letter-spacing:0}
+.card-body{padding:20px 18px;display:flex;gap:28px;align-items:stretch;flex-wrap:wrap}
+.col-title{font-size:14px;font-weight:800;margin-bottom:12px}
+.col-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;min-width:0;max-width:100%;
+  padding-right:28px;border-right:1px solid var(--border)}
+.col-right{flex:1;min-width:260px;overflow-x:auto;display:flex;flex-direction:column;justify-content:center}
+.dist-src{font-size:12px;font-weight:600;color:var(--muted);text-align:center}
+@media (max-width:720px){.col-left{border-right:none;padding:0 0 18px;border-bottom:1px solid var(--border);width:100%}}
+.ptbl{width:100%;border-collapse:collapse;border:2px solid var(--tbl-border);font-variant-numeric:tabular-nums}
+.ptbl th{background:var(--tbl-head);color:var(--tbl-head-text);font-size:12px;font-weight:800;padding:9px 12px;text-align:center}
+.ptbl td{padding:9px 12px;font-size:13px;font-weight:700;text-align:center;border:1px solid var(--tbl-cell);color:var(--text)}
+.plink{color:var(--text);text-decoration:none;font-weight:700;overflow-wrap:anywhere}
+.plink:hover,.plink:focus-visible{text-decoration:underline}
+.out-row td{background:var(--bg);color:var(--muted);border-style:dashed;font-style:italic}
+.not-serp{margin-top:10px;font-size:11px;color:var(--faint);font-style:italic;line-height:1.7}
+.not-serp span{display:inline-block;background:var(--bg);border:1px solid var(--border);border-radius:4px;
+  padding:1px 7px;margin:2px 3px;font-style:normal;font-weight:700;color:var(--muted)}
+.pending{font-size:12px;color:var(--faint);font-style:italic;padding:24px 8px;text-align:center;max-width:220px}
+.col-left{gap:4px}
+.col-left .col-title{text-align:center}
+.col-left .sub{display:block;font-size:11px;font-weight:400;color:var(--faint);margin-top:2px}
+.col-left svg{max-width:100%;height:auto;color:var(--text);overflow:visible}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2" aria-hidden="true">
+    <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+  </svg>
+  <h1>UAE SERP — Platform Tracker</h1>
+
+</div>
+<div class="wrap">
+  <div>
+    <div class="sec-hdr"><h2>Platform Ranking — UAE</h2><span class="tag">Sep 2026</span></div>
+    <p class="top-note">Note: Platforms are ranked by the search traffic their pages get from related
+      keywords, not only from the specific keyword shown on each card.</p>
+  </div>
+
+  <div class="card" id="card-general-practitioner">
+    <div class="card-hdr">General Practitioner
+      <span class="kw">"General Practitioner Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://www.linkedin.com/jobs/search/?geoId=104305776&amp;keywords=doctor&amp;location=United Arab Emirates" target="_blank" rel="noopener">linkedin.com</a></td><td>63.2%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://tatbiqhealthcare.ae/general-practitioner-jobs-uae/" target="_blank" rel="noopener">tatbiqhealthcare.ae</a></td><td>25.6%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://www.gulftalent.com/jobs/title/general-practitioner" target="_blank" rel="noopener">gulftalent.com</a></td><td>8.5%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-gp-doctor-l-dubai-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>2.6%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://www.glassdoor.com/Job/abu-dhabi-general-practitioner-jobs-SRCH_IL.0,9_IM953_KO10,30.htm" target="_blank" rel="noopener">glassdoor.com</a></td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-psychologist">
+    <div class="card-hdr">Psychologist
+      <span class="kw">"Psychologist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-psychologist-l-dubai-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>81.7%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.bayt.com/en/international/jobs/psychologist-jobs/" target="_blank" rel="noopener">bayt.com</a></td><td>7.3%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://www.lighthousearabia.com/about-us/join-our-team/clinical-psychologist" target="_blank" rel="noopener">lighthousearabia.com</a></td><td>6.1%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://ae.jobeka.com/jobs-psychologist-dubai" target="_blank" rel="noopener">jobeka.com</a></td><td>3.7%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://www.careerjet.ae/clinical-psychologist-jobs" target="_blank" rel="noopener">careerjet.ae</a></td><td>1.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-psychiatrist">
+    <div class="card-hdr">Psychiatrist
+      <span class="kw">"Psychiatrist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://maudsleyhealth.com/work-for-us/" target="_blank" rel="noopener">maudsleyhealth.com</a></td><td>43.8%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.allocationassist.com/consultant-psychiatrist-jobs-in-dubai/" target="_blank" rel="noopener">allocationassist.com</a></td><td>31.2%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://www.bayt.com/en/international/jobs/consultant-psychiatrist-jobs/" target="_blank" rel="noopener">bayt.com</a></td><td>25.0%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-psychiatry-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>0.0%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://www.gulftalent.com/jobs/title/consultant-psychiatrist/" target="_blank" rel="noopener">gulftalent.com</a></td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-dentist">
+    <div class="card-hdr">Dentist
+      <span class="kw">"Dentist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-dentist-l-dubai-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>40.4%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.naukrigulf.com/dentist-jobs" target="_blank" rel="noopener">naukrigulf.com</a></td><td>26.2%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://www.gulftalent.com/uae/jobs/abu-dhabi/title/dentist" target="_blank" rel="noopener">gulftalent.com</a></td><td>15.0%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://uk.linkedin.com/jobs/general-dentist-jobs-ae" target="_blank" rel="noopener">linkedin.com</a></td><td>10.2%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://ae.jooble.org/jobs-dentist/Abu-Dhabi" target="_blank" rel="noopener">jooble.org</a></td><td>8.2%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-occupational-therapist">
+    <div class="card-hdr">Occupational Therapist
+      <span class="kw">"Occupational Therapist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-occupational-therapist-l-dubai-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>77.3%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.bayt.com/en/international/jobs/occupational-therapist-jobs/" target="_blank" rel="noopener">bayt.com</a></td><td>18.2%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://careers.moe.gov.ae/en/uae/jobs/occupational-therapist-1100018624/" target="_blank" rel="noopener">moe.gov.ae</a></td><td>4.5%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://www.naukrigulf.com/occupational-therapist-jobs" target="_blank" rel="noopener">naukrigulf.com</a></td><td>0.0%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://brainstorm-uae.com/jobs/occupational-therapist-jobs-dubai-uae/" target="_blank" rel="noopener">brainstorm-uae.com</a></td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-podiatrist">
+    <div class="card-hdr">Podiatrist
+      <span class="kw">"Podiatrist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-podiatrist-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>100.0%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.gulftalent.com/jobs/title/podiatrist" target="_blank" rel="noopener">gulftalent.com</a></td><td>0.0%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://ae.jobsora.com/jobs-podiatrist-abu-dhabi" target="_blank" rel="noopener">jobsora.com</a></td><td>0.0%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://www.nhsjobs.com/job_list/Allied_Health_Professions/s4/Chiropodist_Podiatrist/d517" target="_blank" rel="noopener">nhsjobs.com</a></td><td>0.0%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://www.linkedin.com/jobs/view/4442597828/" target="_blank" rel="noopener">linkedin.com</a></td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-physiotherapist">
+    <div class="card-hdr">Physiotherapist
+      <span class="kw">"Physiotherapist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://ae.linkedin.com/jobs/physiotherapist-jobs" target="_blank" rel="noopener">linkedin.com</a></td><td>59.8%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.glassdoor.co.in/Job/dubai-physiotherapist-jobs-SRCH_IL.0,5_IC2204498_KO6,21.htm" target="_blank" rel="noopener">glassdoor.co.in</a></td><td>32.5%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://physiowell.ae/careers/physiotherapist" target="_blank" rel="noopener">physiowell.ae</a></td><td>4.8%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-physiotherapist-moh-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>1.4%</td></tr>
+<tr><td>5</td><td style="text-align:left"><a class="plink" href="https://ae.jooble.org/jobs-physiotherapist/Abu-Dhabi" target="_blank" rel="noopener">jooble.org</a></td><td>1.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="card" id="card-speech-pathologist">
+    <div class="card-hdr">Speech Pathologist
+      <span class="kw">"Speech Pathologist Jobs"</span></div>
+    <div class="card-body">
+      
+      <div class="col-right">
+        <div class="col-title">Top 5 by Search Traffic</div>
+        <table class="ptbl">
+          <thead><tr><th style="text-align:left">#</th><th style="text-align:left">Platform</th>
+            <th>Share %</th></tr></thead>
+          <tbody>
+<tr><td>1</td><td style="text-align:left"><a class="plink" href="https://qenrichment.com/careers/" target="_blank" rel="noopener">qenrichment.com</a></td><td>70.0%</td></tr>
+<tr><td>2</td><td style="text-align:left"><a class="plink" href="https://www.thespeechclinic.ae/careers" target="_blank" rel="noopener">thespeechclinic.ae</a></td><td>30.0%</td></tr>
+<tr><td>3</td><td style="text-align:left"><a class="plink" href="https://ae.indeed.com/q-speech-language-jobs.html" target="_blank" rel="noopener">indeed.com</a></td><td>0.0%</td></tr>
+<tr><td>4</td><td style="text-align:left"><a class="plink" href="https://www.naukrigulf.com/rehabilitation-speech-pathologist-jobs-in-dubai" target="_blank" rel="noopener">naukrigulf.com</a></td><td>0.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const SC={NSW:'#2979FF',VIC:'#AA00FF',QLD:'#FF6D00',WA:'#E53935',SA:'#00BFA5',ACT:'#00B0FF',TAS:'#78909C',NT:'#FFD600'};
+const DIST={};
+function buildDonut(key){
+  const box=document.getElementById('dist-'+key);
+  if(!box)return;
+  const rows=(DIST[key]||[]).filter(r=>r.count>0).sort((a,b)=>b.count-a.count);
+  const total=rows.reduce((s,r)=>s+r.count,0);
+  if(!total)return;
+  const cx=170,cy=150,R=104,IR=62,p=(r,t)=>[+(cx+r*Math.cos(t)).toFixed(1),+(cy+r*Math.sin(t)).toFixed(1)];
+  let a=-Math.PI/2,slices='',labels=[];
+  rows.forEach(({st,count})=>{
+    const sw=count/total*Math.PI*2,pct=count/total*100,col=SC[st]||'#888';
+    if(rows.length===1){
+      slices+=`<circle cx="${cx}" cy="${cy}" r="${(R+IR)/2}" fill="none" stroke="${col}" stroke-width="${R-IR}"/>`;
+    }else{
+      const [x1,y1]=p(R,a),[x2,y2]=p(R,a+sw),[x3,y3]=p(IR,a+sw),[x4,y4]=p(IR,a),lg=sw>Math.PI?1:0;
+      slices+=`<path d="M${x1},${y1} A${R},${R} 0 ${lg} 1 ${x2},${y2} L${x3},${y3} A${IR},${IR} 0 ${lg} 0 ${x4},${y4} Z" fill="${col}" stroke="var(--surface)" stroke-width="2"><title>${st}: ${count.toLocaleString()} jobs (${pct.toFixed(1)}%)</title></path>`;
+    }
+    if(pct>=4){const m=a+sw/2,[lx,ly]=p(R+30,m);labels.push({st,pct,x:lx,y:ly,left:Math.cos(m)<0});}
+    a+=sw;
+  });
+  // Two-line labels: keep labels on the same side at least 34px apart.
+  [true,false].forEach(side=>{
+    const ls=labels.filter(l=>l.left===side).sort((u,v)=>u.y-v.y);
+    for(let i=1;i<ls.length;i++) if(ls[i].y-ls[i-1].y<34) ls[i].y=ls[i-1].y+34;
+  });
+  const lbl=labels.map(l=>{const anc=Math.abs(l.x-cx)<12?'middle':(l.left?'end':'start');
+    return `<text x="${l.x}" y="${l.y-7}" text-anchor="${anc}" style="font-size:13px;font-weight:800;fill:currentColor">${l.st}</text>`+
+           `<text x="${l.x}" y="${l.y+9}" text-anchor="${anc}" style="font-size:12px;fill:currentColor">${l.pct.toFixed(1)}%</text>`;}).join('');
+  const centre=`<text x="${cx}" y="${cy+2}" text-anchor="middle" style="font-size:28px;font-weight:900;fill:currentColor">${total.toLocaleString()}</text>`+
+    `<text x="${cx}" y="${cy+22}" text-anchor="middle" style="font-size:10px;letter-spacing:.08em;fill:currentColor;opacity:.65">TOTAL JOBS</text>`;
+  box.innerHTML=`<div class="col-title">Job Distribution — All Platforms</div>
+    <svg viewBox="0 0 340 300" width="340" height="300" role="img" aria-label="Jobs by state, all platforms">${slices}${centre}${lbl}</svg>`;
+  // Long names (e.g. "Palmerston North") can run past the edge — size the chart to its labels.
+  const svg=box.querySelector('svg'),bb=svg.getBBox(),pad=8;
+  const x0=Math.min(0,bb.x-pad),y0=Math.min(0,bb.y-pad);
+  const w=Math.max(340,bb.x+bb.width+pad)-x0,h=Math.max(300,bb.y+bb.height+pad)-y0;
+  svg.setAttribute('viewBox',`${x0.toFixed(0)} ${y0.toFixed(0)} ${w.toFixed(0)} ${h.toFixed(0)}`);
+  svg.setAttribute('width',w.toFixed(0));svg.setAttribute('height',h.toFixed(0));
+}
+Object.keys(DIST).forEach(buildDonut);
+</script>
+</body>
+</html>
